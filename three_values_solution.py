@@ -1,10 +1,11 @@
 """Exact solver for the original problem with values 1, 2, and 3.
 
 Input:  n
-Output: maximum possible sum of an n by n grid
+Output: maximum possible sum and one optimal n by n arrangement
 
 The algorithm is a frontier dynamic program.  Each frontier cell stores its
-value and which required neighbor values it has already seen.
+value and which required neighbor values it has already seen. Parent
+transitions are retained to reconstruct one optimum.
 """
 
 from __future__ import annotations
@@ -67,25 +68,18 @@ MAKE_STATE = tuple(
 )
 
 
-def reverse_frontier(frontier: int, width: int) -> int:
-    """Reflect a complete row to merge horizontally symmetric states."""
-    result = 0
-    for column in range(width):
-        digit = (frontier >> (3 * column)) & 7
-        result |= digit << (3 * (width - 1 - column))
-    return result
-
-
-def maximum_sum(n: int) -> int:
+def solve(n: int) -> tuple[int, list[str]]:
     if n <= 0:
         raise ValueError("n must be positive")
 
     empty_frontier = sum(7 << (3 * column) for column in range(n))
     dp: dict[int, int] = {empty_frontier: 0}
+    parents: list[dict[int, tuple[int, int]]] = []
 
     for _row in range(n):
         for column in range(n):
             next_dp: dict[int, int] = {}
+            step_parents: dict[int, tuple[int, int]] = {}
             shift = 3 * column
             current_mask = 7 << shift
             left_shift = shift - 3
@@ -117,28 +111,39 @@ def maximum_sum(n: int) -> int:
                             | (new_left << left_shift)
                         )
 
-                    # Once a row is complete, its reflection has an identical
-                    # remaining subproblem, so retain one orientation only.
-                    if column == n - 1:
-                        new_frontier = min(
-                            new_frontier,
-                            reverse_frontier(new_frontier, n),
-                        )
-
                     new_sum = old_sum + value
                     previous = next_dp.get(new_frontier)
                     if previous is None or new_sum > previous:
                         next_dp[new_frontier] = new_sum
+                        step_parents[new_frontier] = (frontier, value)
 
             dp = next_dp
+            parents.append(step_parents)
 
     answer = 0
+    best_frontier = -1
     for frontier, grid_sum in dp.items():
         if all(
             IS_VALID[(frontier >> (3 * column)) & 7]
             for column in range(n)
-        ):
-            answer = max(answer, grid_sum)
+        ) and grid_sum > answer:
+            answer = grid_sum
+            best_frontier = frontier
+
+    # Follow the chosen transitions backward to recover one optimal grid.
+    grid = [["?"] * n for _ in range(n)]
+    frontier = best_frontier
+    for step in range(n * n - 1, -1, -1):
+        previous_frontier, value = parents[step][frontier]
+        row, column = divmod(step, n)
+        grid[row][column] = str(value)
+        frontier = previous_frontier
+
+    return answer, ["".join(row) for row in grid]
+
+
+def maximum_sum(n: int) -> int:
+    answer, _grid = solve(n)
     return answer
 
 
@@ -148,7 +153,10 @@ def main() -> None:
         raise SystemExit("expected one positive integer n")
 
     n = int(data[0])
-    print(maximum_sum(n))
+    answer, grid = solve(n)
+    print(f"maximum sum = {answer}")
+    print("arrangement:")
+    print(*grid, sep="\n")
 
 
 if __name__ == "__main__":

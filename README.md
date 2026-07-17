@@ -13,7 +13,7 @@ at small grids and algorithmic experimentation.
 | File | Variant | Output |
 |:--|:--|:--|
 | `three_values_solution.cpp` | Values 1, 2, 3 | Maximum sum and an optimal arrangement |
-| `three_values_solution.py` | Values 1, 2, 3 | Maximum sum |
+| `three_values_solution.py` | Values 1, 2, 3 | Maximum sum and an optimal arrangement |
 | `two_values_solution.cpp` | Values 1, 2 | Maximum sum and an optimal arrangement |
 | `two_values_solution.py` | Values 1, 2 | Maximum sum and an optimal arrangement |
 
@@ -41,7 +41,8 @@ The repository provides two exact implementations:
 
 - `three_values_solution.cpp` prints the maximum sum and one optimal
   arrangement.
-- `three_values_solution.py` prints the maximum sum.
+- `three_values_solution.py` prints the maximum sum and one optimal
+  arrangement.
 
 ## Problem 2: values 1 and 2
 
@@ -172,8 +173,7 @@ echo 5 | python three_values_solution.py
 echo 5 | python two_values_solution.py
 ```
 
-`three_values_solution.py` prints only the maximum sum. The two-value Python
-program prints both the maximum sum and one optimal arrangement.
+Both Python programs print the maximum sum and one optimal arrangement.
 
 ## Verified small results
 
