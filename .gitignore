@@ -1,0 +1,21 @@
+# C and C++ build outputs
+*.exe
+*.out
+*.o
+*.obj
+
+# Python bytecode and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local Codex workspace metadata
+.agents/
+.codex/
